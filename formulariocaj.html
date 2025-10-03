@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#d62828" />
+  <title>Formulario — Cajeros</title>
+  <link rel="icon" href="favicon.ico" />
+
+  <!-- Tema base + estilos exclusivos de formularios -->
+  <link rel="stylesheet" href="forms.css" />
+</head>
+
+<body class="form-page">
+  <!-- Overlay de carga -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="glass-loader">
+      <div class="glass-card">
+        <div class="loader-ring">
+          <span class="ring r1"></span>
+          <span class="ring r2"></span>
+        </div>
+        <div class="loader-title" id="overlay-msg">Cargando…</div>
+        <div class="progress-bar"><div class="progress-fill" id="overlay-progress"></div></div>
+        <p class="loader-sub" id="overlay-sub">Conectando con la base de datos</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <main class="form-shell">
+    <!-- Logo/Hero compacto -->
+    <div class="hero">
+      <img src="logo.png" alt="LiderControl" onerror="this.src='icon-192.png'">
+    </div>
+
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="title"><h1>Formulario — Cajeros</h1></div>
+      <p id="fecha" class="muted" aria-live="polite"></p>
+    </header>
+
+    <!-- Card: Datos del CAJERO -->
+    <section class="card">
+      <h2>Selecciona un cajero</h2>
+      <p class="muted" style="margin:0 0 10px">Busca por nombre del documento (cajero), dirección o distrito.</p>
+
+      <div class="search-wrap">
+        <input id="cj-search" class="search" type="search"
+               placeholder="Buscar cajero… (ej. BOTICA CANTO GRANDE, SAN JUAN)"
+               autocomplete="off" />
+        <div id="cj-suggest" class="suggest" role="listbox" aria-label="Sugerencias"></div>
+      </div>
+
+      <div class="grid-2" style="margin-top:12px">
+        <div class="field">
+          <label for="cj-name">Cajero (doc id)</label>
+          <input id="cj-name" placeholder="—" disabled />
+        </div>
+        <div class="field">
+          <label for="cj-termid">TERM ID</label>
+          <input id="cj-termid" placeholder="—" disabled />
+        </div>
+
+        <div class="field">
+          <label for="cj-direccion">DIRECCION</label>
+          <input id="cj-direccion" placeholder="—" disabled />
+        </div>
+        <div class="field">
+          <label for="cj-distrito">DISTRITO</label>
+          <input id="cj-distrito" placeholder="—" disabled />
+        </div>
+
+        <div class="field">
+          <label for="cj-consola">CONSOLA</label>
+          <input id="cj-consola" placeholder="—" disabled />
+        </div>
+        <div class="field">
+          <label for="cj-estado">ESTADO</label>
+          <input id="cj-estado" placeholder="—" disabled />
+        </div>
+
+        <div class="field">
+          <label for="cj-turbina">TURBINA</label>
+          <input id="cj-turbina" placeholder="—" disabled />
+        </div>
+      </div>
+    </section>
+
+    <!-- Card: Clasificación / Comentario / Fotos -->
+    <section class="card">
+      <h2>Clasificación</h2>
+      <div class="grid-2">
+        <div class="field">
+          <label for="sel-cat">Seleccione Categoría</label>
+          <select id="sel-cat"></select>
+        </div>
+        <div class="field">
+          <label for="sel-motivo">Seleccione Motivo</label>
+          <select id="sel-motivo"></select>
+        </div>
+        <div class="field">
+          <label for="sel-nov">Seleccione Novedad</label>
+          <select id="sel-nov"></select>
+        </div>
+        <div class="field">
+          <label for="sel-detalle">Detalle de Novedad</label>
+          <select id="sel-detalle"></select>
+        </div>
+
+        <div class="field">
+          <label for="cj-turno">TURNO</label>
+          <select id="cj-turno">
+            <option value="">Seleccionar…</option>
+            <option value="MAÑANA">MAÑANA</option>
+            <option value="TARDE">TARDE</option>
+          </select>
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <label for="comentario">Agregar comentario</label>
+          <textarea id="comentario" rows="3" placeholder="Escribe tu comentario…"></textarea>
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <label>Adjuntar foto(s)</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <!-- Nuevo botón para adjuntar archivos -->
+            <button id="btn-adjuntar" class="btn danger" type="button">Adjuntar archivo</button>
+            <small id="foto-hint" class="muted">Formatos JPG/PNG. Puedes adjuntar varias fotos.</small>
+          </div>
+
+          <!-- Input de archivos oculto: reutiliza el id cam-file que tu JS ya maneja -->
+          <input id="cam-file" type="file" accept="image/*" multiple style="display:none" />
+
+          <div id="foto-preview" class="preview"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <div class="actions-footer">
+      <button id="btn-cancelar" class="btn ghost" type="button">Cancelar</button>
+      <button id="btn-enviar" class="btn primary" type="button">Enviar</button>
+    </div>
+  </main>
+
+  <!-- Firebase compat + config -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- Lógica principal -->
+  <script src="formulariocaj.js"></script>
+
+  <!-- Puente mínimo: este botón solo abre el selector de archivos -->
+  <script>
+    (function(){
+      const pick = document.getElementById('cam-file');
+      const btn  = document.getElementById('btn-adjuntar');
+      if(btn && pick){
+        btn.addEventListener('click', () => pick.click());
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LiderControl — Iniciar sesión</title>
+  <link rel="icon" href="favicon.ico" />
+
+  <!-- Tema claro (blanco + rojo + texto negro) y efectos 3D -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Firebase 8.x (compatible con firebase-config.js y login.js) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <!-- Carga tu config ANTES del login.js -->
+  <script src="./firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- Efecto de transición que puede activar login.js -->
+  <div id="pageFx"></div>
+
+  <main class="page-login">
+    <section class="auth">
+      <!-- Panel izquierdo (logo con tarjeta 3D) -->
+      <div class="hero">
+        <img src="logo.png" alt="LiderControl" onerror="this.src='icon-192.png'">
+      </div>
+
+      <!-- Panel derecho (formulario) -->
+      <div class="card">
+        <div class="brand-mini">
+          <img src="logo.png" alt="LiderControl" onerror="this.src='icon-192.png'">
+          <strong>LiderControl</strong>
+        </div>
+
+        <div class="welcome">
+          <h1>Bienvenido</h1>
+          <p class="muted">Ingresa con tu cuenta corporativa</p>
+        </div>
+
+        <form id="loginForm" class="form-grid" novalidate>
+          <!-- Correo -->
+          <div class="field">
+            <label for="email">Correo</label>
+            <input id="email" type="email" placeholder="tucorreo@liderman.com.pe" autocomplete="username" />
+            <div id="emailMsg" class="hint"></div>
+          </div>
+
+          <!-- Contraseña + botón ojo -->
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <div class="input-affix">
+              <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+              <button id="togglePass" class="affix-btn" type="button" aria-label="Mostrar/ocultar">
+                <!-- icono ojo -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <div id="passMsg" class="hint"></div>
+          </div>
+
+          <!-- Recordarme + recuperar -->
+          <div class="form-row" style="margin-top:4px">
+            <label style="font-weight:700; color:#374151; display:flex; align-items:center; gap:8px">
+              <input id="remember" type="checkbox" /> Recordarme
+            </label>
+            <a class="link" href="#" id="forgotBtn">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <!-- Acciones -->
+          <div class="form-actions">
+            <button id="submitBtn" class="btn primary" type="submit">Iniciar sesión</button>
+          </div>
+
+          <div class="footer-note">© <span id="y"></span> J&amp;V / LiderControl- Liderman ST</div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Diálogo de restablecimiento de contraseña -->
+  <dialog id="resetDlg">
+    <div class="dlg__head">
+      <strong>Restablecer contraseña</strong>
+      <button class="iconbtn" onclick="document.getElementById('resetDlg').close('x')" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="dlg__body">
+      <div class="field">
+        <label for="resetEmail">Correo</label>
+        <input id="resetEmail" type="email" placeholder="tucorreo@liderman.com.pe">
+        <div id="resetMsg" class="hint"></div>
+        <div id="resetOk" class="hint" style="color:var(--ok)"></div>
+        <div id="resetError" class="hint err"></div>
+      </div>
+    </div>
+    <div class="dlg__foot">
+      <button class="btn ghost" onclick="document.getElementById('resetDlg').close('x')">Cancelar</button>
+      <button id="resetSend" class="btn primary">Enviar enlace</button>
+    </div>
+  </dialog>
+
+  <!-- Contenedor para toasts -->
+  <div class="toast-host"></div>
+
+  <!-- Lógica de login (usa Firebase Auth v8 y los IDs anteriores) -->
+  <script src="./login.js"></script>
+
+  <!-- Año automático & brillo del botón siguiendo el mouse (efecto glossy) -->
+  <script>
+    // Año del pie
+    (function(){var y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear();})();
+
+    // Brillo del botón "Iniciar sesión" que sigue el puntero
+    document.addEventListener('pointermove', function(e){
+      var b = document.querySelector('.page-login .btn.primary');
+      if(!b) return;
+      var r = b.getBoundingClientRect();
+      var mx = ((e.clientX - r.left) / Math.max(r.width,1)) * 100;
+      var my = ((e.clientY - r.top) / Math.max(r.height,1)) * 100;
+      b.style.setProperty('--mx', mx + '%');
+      b.style.setProperty('--my', my + '%');
+    }, {passive:true});
+  </script>
+</body>
+</html>
