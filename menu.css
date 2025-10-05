@@ -26,7 +26,7 @@
   --card-radius:16px;
   --shadow:0 12px 34px rgba(0,0,0,.08);
 
-  /* Sidebar fijo */
+  /* Ancho del sidebar cuando está fijo */
   --sidebar-w: 240px;
 }
 
@@ -39,11 +39,16 @@ body{
   font:20px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
 }
 
-/* ========= Layout principal ========= */
+/* ========= Layout ========= */
 .app{display:block; min-height:100svh;}
 
-/* ========= Sidebar fijo ========= */
-.sidebar{
+/* ========= Sidebar (solo si el body tiene .fixed-sidebar) ========= */
+
+/* Por defecto: oculto (para formularios u otras páginas) */
+.sidebar{ display:none; }
+
+/* Dashboard: sidebar fijo e inamovible */
+body.fixed-sidebar .sidebar{
   position:fixed; left:0; top:0; width:var(--sidebar-w); height:100vh;
   overflow-y:auto;
   background:var(--panel);
@@ -69,20 +74,18 @@ body{
 .menu__item svg{width:20px; height:20px}
 .menu__item:hover{background:#fff2f2}
 .menu__item.is-active{background:#fdecec; border-color:#f2b4b4; color:var(--primary-2)}
-
 .sidebar__footer{margin-top:auto; padding:14px 16px; color:#6b7280}
 
-/* Ignora modo colapsado */
-body.collapsed .sidebar{ width:var(--sidebar-w); transform:none; }
-
-/* ========= Contenido ========= */
+/* Contenido: sin margen por defecto */
 .content{
-  margin-left:var(--sidebar-w);
+  margin-left:0;
   min-width:0;
   display:flex; flex-direction:column;
 }
+/* En dashboard, el contenido se desplaza */
+body.fixed-sidebar .content{ margin-left:var(--sidebar-w); }
 
-/* Topbar */
+/* ========= Topbar ========= */
 .topbar{
   position:sticky; top:0; z-index:10;
   display:flex; align-items:center; gap:12px;
@@ -137,10 +140,10 @@ select:focus,input:focus{
 .btn.danger{ background:linear-gradient(180deg,#ef4444,#b91c1c); border-color:#991b1b; color:#fff }
 .btn[disabled]{ opacity:.6; pointer-events:none }
 
-/* Tamaño compacto para pequeños controles */
+/* Tamaño compacto */
 .btn.sm{ padding:8px 14px; border-radius:12px; font-size:14px }
 
-/* Botón Excel destacado */
+/* Botón Excel */
 .btn.excel{
   background:linear-gradient(180deg,#22c55e,#16a34a);
   border-color:#15803d; color:#fff;
@@ -202,47 +205,86 @@ select:focus,input:focus{
 .modal__foot{display:flex; justify-content:flex-end; margin-top:12px}
 
 /* ========= Visor embebido (iframe) ========= */
-.embed{position:fixed; inset:0; display:none; flex-direction:column; background:#fff; z-index:70}
-.embed.active{display:flex}
+/* ========= Visor embebido (iframe) ========= */
+/* Antes: .embed { position:fixed; inset:0; ... } */
+.embed{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--sidebar-w);     /* <- respeta el ancho del menú lateral */
+  display: none;
+  flex-direction: column;
+  background: #fff;
+  z-index: 120;               /* por encima del sidebar (que está en 100) */
+}
+.embed.active{ display:flex; }
+
 .embed__bar{
   display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:10px 12px; background:#fff; border-bottom:1px solid var(--line)
+  padding:10px 12px; background:#fff; border-bottom:1px solid var(--line);
+  position: sticky; top: 0; z-index: 1;
 }
-.embed__left{display:flex; align-items:center; gap:8px}
-.embed iframe{flex:1; border:0}
 
-/* ========= Tabla / Datagrid ========= */
+.embed iframe{
+  flex: 1;
+  border: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ========= Tabla / Grid ========= */
+/* (soporta tanto la estructura .datagrid como la .table del HTML actual) */
 .datagrid{ padding:12px; }
-
 .datagrid__head{
   display:flex; align-items:center; justify-content:space-between;
   gap:12px; margin-bottom:8px; padding:0 2px;
 }
 .datagrid__head-left{ display:flex; align-items:center; gap:10px; color:#6b7280; font-size:14px; }
 .datagrid__head-right{ display:flex; align-items:center; gap:8px; }
-
-.table-wrap{
+.table-wrap,
+.table-scroll{
   overflow:auto;
   border:1px solid var(--line); border-radius:12px; background:#fff;
+  max-height:62vh;
 }
-.datagrid table{ width:100%; border-collapse:separate; border-spacing:0; }
-.datagrid thead th{
+.datagrid table,
+.table{ width:100%; border-collapse:separate; border-spacing:0; }
+.datagrid thead th,
+.table thead th{
   position:sticky; top:0; background:#fff; z-index:1;
   border-bottom:1px solid var(--line);
 }
-.datagrid th, .datagrid td{ padding:10px 12px; font-size:14px; border-bottom:1px solid var(--line); }
-.datagrid tbody tr:hover{ background:#fffaf9; }
-.datagrid .grid-foot{
+.datagrid th, .datagrid td,
+.table th, .table td{
+  padding:10px 12px; font-size:14px; border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+.datagrid tbody tr:hover,
+.table tbody tr:hover{ background:#fffaf9; }
+.datagrid .grid-foot,
+.pager{
   display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px;
 }
-.pager{ display:flex; align-items:center; gap:6px; }
 .pager .btn{ padding:8px 12px; border-radius:10px; }
 
-/* ========= Overlay de carga (no tapa el sidebar) ========= */
+/* Cabecera de la tabla del HTML actual */
+.table-head{
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  border-bottom:1px solid var(--line);
+}
+.table-head .grow{flex:1}
+
+/* ========= Overlay de carga ========= */
+/* Base: cubre toda la pantalla */
 #overlay{
-  position:fixed; top:0; right:0; bottom:0; left:var(--sidebar-w);
+  position:fixed; inset:0; left:0; right:0; bottom:0; top:0;
   display:none; z-index:80;
 }
+/* En dashboard, no tapa el sidebar fijo */
+body.fixed-sidebar #overlay{ left:var(--sidebar-w); }
+
 #overlay[aria-hidden="false"]{ display:block; }
 .glass-loader{ position:absolute; inset:0; display:grid; place-items:center; background:#00000026; backdrop-filter:blur(2px); }
 .glass-card{ width:min(520px,92vw); border-radius:18px; padding:16px; background:#fff; border:1px solid var(--line); box-shadow:var(--shadow); text-align:center; }

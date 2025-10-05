@@ -1,14 +1,17 @@
-/* menu.js — Dashboard v3.12
-   - KPIs + gráficos + filtros (incluye Turbina)
-   - Tabla dinámica con paginación (10 filas)
-   - Exportación a EXCEL (.xlsx) con SheetJS
-   - Overlay de carga mientras se consultan/dibujan datos
-   - Sidebar inamovible (sin colapso)
+/* menu.js — Dashboard v3.13.1
+   - KPIs + gráficos + filtros (Turbina + Usuario)
+   - Tabla con paginación (10 filas)
+   - Exportación EXCEL (.xlsx) con SheetJS
+   - Overlay de carga
+   - Sidebar fijo (activa .fixed-sidebar en <body>)
 */
 (() => {
   const $  = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
   const normU = t => (t||'').toString().normalize('NFD').replace(/\p{Diacritic}/gu,'').toUpperCase().trim();
+
+  // Activa el layout de sidebar fijo para este dashboard
+  document.body.classList.add('fixed-sidebar');
 
   // ---------- Toast ----------
   const toastHost = document.querySelector('.toast-host') || (() => {
@@ -30,8 +33,7 @@
       <button type="button" class="toast__close" aria-label="Cerrar">✕</button>`;
     toastHost.appendChild(t);
     const close = () => { t.classList.add('out'); setTimeout(()=>t.remove(), 280); };
-    const btn = t.querySelector('.toast__close');
-    if (btn) btn.addEventListener('click', close);
+    t.querySelector('.toast__close')?.addEventListener('click', close);
     const id = setTimeout(close, ms);
     t.addEventListener('pointerenter', ()=>clearTimeout(id), { once:true });
   }
@@ -42,9 +44,8 @@
     if (el) el.style.width = `${Math.max(0, Math.min(100, Math.round((f||0)*100)))}%`;
   }
   function showOverlay(msg='Cargando…', sub=''){
-    const m = $('#overlay-msg'), s = $('#overlay-sub');
-    if (m) m.textContent = msg;
-    if (s) s.textContent = sub || '';
+    $('#overlay-msg') && ($('#overlay-msg').textContent = msg);
+    $('#overlay-sub') && ($('#overlay-sub').textContent = sub || '');
     setProgress(0);
     $('#overlay')?.setAttribute('aria-hidden','false');
   }
@@ -76,8 +77,7 @@
 
   // ---------- UI básica ----------
   $('#y') && ($('#y').textContent = new Date().getFullYear());
-  // Sidebar inamovible: sin colapso
-  document.body.classList.remove('collapsed');
+  // El botón hamburger ya no colapsa el sidebar
   $('#btnHamb')?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); });
 
   $('#btnLogout')?.addEventListener('click', async () => {
@@ -169,6 +169,11 @@
     predictList.classList.remove('show');
   });
   localInput?.addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnBuscar')?.click(); });
+
+  // ---------- Usuario (nuevo filtro) ----------
+  const userInput = $('#f-usuario');
+  const userDatalist = $('#dlUsuarios');
+  userInput?.addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnBuscar')?.click(); });
 
   // ---------- Charts ----------
   try {
@@ -345,13 +350,13 @@
     drawPage();
   }
 
-  // Controles paginación
+  // Paginación
   btnFirst?.addEventListener('click', ()=>{ CURRENT_PAGE = 1; drawPage(); });
   btnPrev ?.addEventListener('click', ()=>{ CURRENT_PAGE = Math.max(1, CURRENT_PAGE-1); drawPage(); });
   btnNext ?.addEventListener('click', ()=>{ CURRENT_PAGE = Math.min(totalPages(), CURRENT_PAGE+1); drawPage(); });
   btnLast ?.addEventListener('click', ()=>{ CURRENT_PAGE = totalPages(); drawPage(); });
 
-  // Export a EXCEL (.xlsx)
+  // Exportar EXCEL
   function exportToExcel(){
     if (!TABLE_MAPPED.length){
       toast({ title:'Exportar', msg:'No hay datos para exportar.', type:'warn' });
@@ -394,8 +399,9 @@
     const fuente = $('#fuente')?.value || 'reportes_cajeros';
     const m = +($('#mes')?.value ?? new Date().getMonth());
     const y = +($('#anio')?.value ?? new Date().getFullYear());
-    const idFilter  = (localInput?.value || '').trim();
-    const turFilter = ($('#f-turbina')?.value || '').trim();
+    const idFilter   = (localInput?.value || '').trim();
+    const turFilter  = ($('#f-turbina')?.value || '').trim();
+    const userFilter = (userInput?.value || '').trim();
 
     showOverlay('Cargando datos…', `Fuente: ${fuente}`); setProgress(0.1);
 
@@ -428,6 +434,18 @@
         const cs = normU(getConsola(r));
         return isConsTorre ? (cs === 'CONSOLA TORRE') : (t === normU(turFilter));
       });
+    }
+
+    if (userFilter) {
+      const qU = normU(userFilter);
+      rows = rows.filter(r => normU(r?.user?.email || '').includes(qU));
+    }
+
+    // Sugerencias de usuario (opciones del datalist)
+    if (userDatalist) {
+      const emails = [...new Set(rows.map(r => (r?.user?.email || '').trim()).filter(Boolean))]
+        .sort((a,b)=>a.localeCompare(b));
+      userDatalist.innerHTML = emails.map(e => `<option value="${e}"></option>`).join('');
     }
 
     setProgress(0.7);
@@ -472,7 +490,7 @@
       toast({ title:'Incluyendo sin fecha', msg:'Se considerarán como 30/09/2025 (solo Sep-2025).', type:'ok', ms:4200 });
     }
 
-    // Tabla con paginación
+    // Tabla
     updateTable(rows, fuente);
 
     setProgress(1); hideOverlay();
@@ -485,11 +503,14 @@
     fillMonthYear();
     $('#local').value = '';
     $('#f-turbina') && ($('#f-turbina').value = '');
+    $('#f-usuario') && ($('#f-usuario').value = '');
+    if (userDatalist) userDatalist.innerHTML = '';
     CURRENT_PAGE = 1;
     queryData();
   });
   $('#fuente')?.addEventListener('change', ()=>{ CURRENT_PAGE = 1; queryData(); });
   $('#f-turbina')?.addEventListener('change', ()=>{ CURRENT_PAGE = 1; queryData(); });
+  $('#f-usuario')?.addEventListener('change', ()=>{ CURRENT_PAGE = 1; queryData(); });
 
   // ---------- Arranque ----------
   if (auth) {

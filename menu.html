@@ -7,22 +7,6 @@
   <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="menu.css" />
 
-  <!-- Overlay (mismo look&feel que formularios) -->
-  <style>
-    #overlay{position:fixed;inset:0;display:none;z-index:2000}
-    #overlay[aria-hidden="false"]{display:block}
-    .glass-loader{position:absolute;inset:0;display:grid;place-items:center;background:#00000026;backdrop-filter:blur(2px)}
-    .glass-card{width:min(520px,92vw);border-radius:18px;padding:16px;text-align:center;background:#fff;border:1px solid #e5e7eb;box-shadow:0 18px 50px rgba(0,0,0,.10)}
-    .loader-ring{position:relative;width:96px;height:96px;margin:6px auto 10px}
-    .loader-ring .ring{position:absolute;inset:0;border-radius:50%;border:4px solid #fecaca;border-top-color:#d62828;animation:spin 1s linear infinite}
-    .loader-ring .r2{inset:8px;border-color:#fde1e1;border-top-color:#b71c1c;animation-duration:1.6s}
-    .loader-title{font-weight:900}
-    .loader-sub{color:#6b7280;margin:0}
-    .progress-bar{height:8px;border-radius:999px;overflow:hidden;background:#f3f4f6;margin:12px 0 4px;border:1px solid #e5e7eb}
-    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#d62828,#b71c1c)}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
-
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -37,8 +21,8 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <script src="./firebase-config.js"></script>
 </head>
-<body>
-  <!-- Overlay de carga -->
+<body class="fixed-sidebar">
+  <!-- Overlay de carga (estilos vienen desde menu.css para NO tapar el sidebar) -->
   <div id="overlay" aria-hidden="true">
     <div class="glass-loader">
       <div class="glass-card">
@@ -65,11 +49,13 @@
       <nav class="menu">
         <button class="menu__item is-active" id="nav-home">
           <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-        <span>Inicio</span></button>
+        <span>Inicio</span>
+        </button>
 
         <button class="menu__item" id="nav-create">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round" stroke="currentColor" fill="none"/></svg>
-        <span>Crear registro</span></button>
+          <span>Crear registro</span>
+        </button>
       </nav>
 
       <div class="sidebar__footer">
@@ -128,6 +114,13 @@
             <option value="TURBINA-03">TURBINA-03</option>
             <option value="CONSOLA TORRE">CONSOLA TORRE</option>
           </select>
+        </div>
+
+        <!-- Filtro por usuario -->
+        <div class="field">
+          <label>Usuario:</label>
+          <input id="f-usuario" list="dlUsuarios" placeholder="correo o parte…" />
+          <datalist id="dlUsuarios"></datalist>
         </div>
 
         <div class="field actions">
