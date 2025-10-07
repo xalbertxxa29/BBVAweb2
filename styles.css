@@ -1,6 +1,7 @@
-/* styles.css — Tema claro blanco + rojo + texto negro
-   Aplica a: login (index.html), formularios (formulariocaj.html / formularioof.html)
-   Incluye: tipografía base, tarjetas, inputs, grids, botones, dialog, toasts y upgrade 3D del login
+/* styles.css — Tema claro + login GRANDE
+   - Tipografías y controles más grandes
+   - Tarjetas con mayor padding
+   - Login centrado con ancho mayor y logo más grande
 */
 
 /* ============================ Variables ============================ */
@@ -14,30 +15,37 @@
   --line:#e5e7eb;
 
   /* Acentos */
-  --primary:#d62828;      /* rojo */
-  --primary-2:#b71c1c;    /* rojo oscuro */
+  --primary:#d62828;
+  --primary-2:#b71c1c;
   --ok:#16a34a;
   --warn:#f59e0b;
   --danger:#b91c1c;
 
-  /* Extras (faltantes en formularios) */
+  /* Extras */
   --border: var(--line);
-  --danger-3: #fee2e2;
-  --fg: var(--ink);
-  --shadow-sm: 0 6px 16px rgba(0,0,0,.06);
+  --danger-3:#fee2e2;
+  --fg:var(--ink);
+  --shadow-sm:0 6px 16px rgba(0,0,0,.06);
 
   /* Sombra y radios */
   --radius:18px;
   --radius-sm:12px;
   --shadow:0 18px 50px rgba(0,0,0,.10);
 
-  /* Charts (usadas por el dashboard) */
+  /* Charts (dashboard) */
   --chart-grid:#e5e7eb;
   --chart-axis:#111111;
   --chart-label:#111111;
   --chart-bar:#d62828;
   --chart-1:#d62828; --chart-2:#ef4444; --chart-3:#f97316; --chart-4:#f59e0b;
   --chart-5:#fb7185; --chart-6:#f43f5e; --chart-7:#dc2626; --chart-8:#b91c1c;
+
+  /* Escala global (ajústala si quieres aún más grande) */
+  --base-font:30.75px;
+  --control-font:30.75px;
+  --heading-1:40px;
+  --heading-2:31px;
+  --heading-3:31px;
 }
 
 /* ============================ Base ============================ */
@@ -47,16 +55,16 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font:14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  font:var(--base-font)/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
 }
 img{max-width:100%; display:block}
 
 /* Utilidades */
-.container{max-width:1100px; margin:0 auto; padding:0 16px}
+.container{max-width:1200px; margin:0 auto; padding:0 16px}
 .center{display:grid; place-items:center}
 .hidden{display:none !important}
 .muted{color:var(--muted)}
-.hr{height:1px; background:var(--line); margin:10px 0}
+.hr{height:1px; background:var(--line); margin:12px 0}
 
 /* ============================ Tarjetas / contenedores ============================ */
 .card{
@@ -64,42 +72,43 @@ img{max-width:100%; display:block}
   border:1px solid var(--line);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  padding:18px;
+  padding:22px;
 }
 
 /* ============================ Tipografía ============================ */
-h1,h2,h3{margin:0 0 10px}
-h1{font-size:26px; font-weight:900; letter-spacing:.2px}
-h2{font-size:20px; font-weight:800; color:#374151}
-h3{font-size:16px; font-weight:800; color:#374151}
+h1,h2,h3{margin:0 0 12px}
+h1{font-size:var(--heading-1); font-weight:900; letter-spacing:.2px}
+h2{font-size:var(--heading-2); font-weight:800; color:#374151}
+h3{font-size:var(--heading-3); font-weight:800; color:#374151}
 
 /* ============================ Formularios base ============================ */
-label{display:block; font-weight:800; color:#374151; margin:0 0 6px}
+label{display:block; font-weight:800; color:#374151; margin:0 0 8px}
 input,select,textarea{
   width:100%;
   background:#fff;
   color:var(--ink);
   border:1px solid var(--line);
   border-radius:var(--radius-sm);
-  padding:10px 12px;
+  padding:13px 14px;                 /* más altos y anchos */
+  font-size:var(--control-font);
   outline:none;
 }
-input::placeholder, textarea::placeholder{ color:#6b728099 }
+input::placeholder,textarea::placeholder{ color:#6b728099 }
 input:focus,select:focus,textarea:focus{
   border-color:var(--primary);
   box-shadow:0 0 0 4px #fca5a52e;
   background:#fff;
 }
-.field{display:flex; flex-direction:column; gap:6px; margin-bottom:10px}
-.field--row{display:flex; gap:10px}
-.field--row > *{flex:1}
+.field{display:flex; flex-direction:column; gap:8px; margin-bottom:12px}
+.field--row{display:flex; gap:12px}
+.field--row>*{flex:1}
 
 /* Toggle de contraseña */
 .input-affix{position:relative}
 .input-affix .affix-btn{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
   border:1px solid var(--line); background:#fff; color:#111;
-  width:36px; height:36px; border-radius:10px; display:grid; place-items:center; cursor:pointer;
+  width:40px; height:40px; border-radius:10px; display:grid; place-items:center; cursor:pointer;
 }
 
 /* ============================ Botones ============================ */
@@ -107,11 +116,12 @@ input:focus,select:focus,textarea:focus{
   border:1px solid var(--line);
   background:#fff;
   color:#111;
-  padding:10px 14px;
+  padding:12px 16px;                 /* más grandes */
   border-radius:var(--radius-sm);
   font-weight:900;
   cursor:pointer;
   transition:filter .15s ease, transform .06s ease, box-shadow .15s ease;
+  font-size:var(--control-font);
 }
 .btn:hover{ filter:brightness(1.02) }
 .btn:active{ transform:translateY(1px) }
@@ -121,12 +131,12 @@ input:focus,select:focus,textarea:focus{
   background:linear-gradient(180deg,var(--primary),var(--primary-2));
   border-color:var(--primary-2);
   color:#fff;
-  box-shadow:0 10px 26px #ef444455;
+  box-shadow:0 12px 28px #ef444455;
 }
 .btn.ghost{ background:#fff; border-color:var(--line); color:#111; box-shadow:none }
-.btn.ok{    background:linear-gradient(180deg,#22c55e,#16a34a); border-color:#15803d; color:#fff; }
-.btn.warn{  background:linear-gradient(180deg,#f59e0b,#d97706); border-color:#b45309; color:#fff; }
-.btn.danger{background:linear-gradient(180deg,#ef4444,#b91c1c); border-color:#991b1b; color:#fff; }
+.btn.ok{    background:linear-gradient(180deg,#22c55e,#16a34a); border-color:#15803d; color:#fff }
+.btn.warn{  background:linear-gradient(180deg,#f59e0b,#d97706); border-color:#b45309; color:#fff }
+.btn.danger{background:linear-gradient(180deg,#ef4444,#b91c1c); border-color:#991b1b; color:#fff }
 
 /* ============================ Login (index.html) ============================ */
 .page-login{
@@ -137,37 +147,38 @@ input:focus,select:focus,textarea:focus{
     radial-gradient(1100px 600px at -10% -10%, #fff1f1 0%, transparent 50%),
     var(--bg);
 }
-.auth{ width:min(960px, 92vw); display:grid; grid-template-columns: 1.2fr 1fr; gap:16px; }
-@media (max-width:900px){ .auth{ grid-template-columns:1fr; } }
+/* ancho mayor del conjunto */
+.auth{ width:min(1200px, 96vw); display:grid; grid-template-columns: 1.35fr 1fr; gap:18px; }
+@media (max-width:980px){ .auth{ grid-template-columns:1fr; width:min(700px, 96vw) } }
 .auth .hero{
   position:relative; border-radius:var(--radius); overflow:hidden;
   background:#fff; border:1px solid var(--line); box-shadow:var(--shadow);
-  display:grid; place-items:center; padding:32px;
+  display:grid; place-items:center; padding:40px;            /* + padding */
 }
 .auth .hero::before{
   content:""; position:absolute; inset:-2px; border-radius:inherit;
   background:
     radial-gradient(60% 50% at 80% 10%, #ffefef 0%, transparent 60%),
     radial-gradient(50% 40% at 10% 90%, #fff6f6 0%, transparent 60%);
-  filter: blur(8px); pointer-events:none; opacity:.9;
+  filter:blur(8px); pointer-events:none; opacity:.9;
 }
-.auth .hero img{max-width:80%; height:auto; filter:drop-shadow(0 10px 30px rgba(0,0,0,.10))}
+.auth .hero img{max-width:88%; height:auto; filter:drop-shadow(0 12px 32px rgba(0,0,0,.10))}
 
-.auth .card{ padding:18px; position:relative; }
-.brand-mini{ display:flex; align-items:center; gap:10px; margin-bottom:6px }
-.brand-mini img{ width:44px; height:44px; object-fit:contain }
-.brand-mini strong{ font-size:18px }
-.form-actions{ display:flex; gap:10px; align-items:center; margin-top:8px }
-.form-row{ display:flex; gap:10px; align-items:center; justify-content:space-between }
+.auth .card{ padding:22px; position:relative; }
+.brand-mini{ display:flex; align-items:center; gap:12px; margin-bottom:8px }
+.brand-mini img{ width:52px; height:52px; object-fit:contain }
+.brand-mini strong{ font-size:20px }
+.form-actions{ display:flex; gap:12px; align-items:center; margin-top:10px }
+.form-row{ display:flex; gap:12px; align-items:center; justify-content:space-between }
 
 a.link{ color:var(--primary-2); text-decoration:none; font-weight:700 }
 a.link:hover{ text-decoration:underline }
-.footer-note{ margin-top:10px; color:var(--muted); font-size:12px; text-align:center }
+.footer-note{ margin-top:12px; color:var(--muted); font-size:13px; text-align:center }
 
 /* Efecto “wipe” del login (#pageFx) */
 #pageFx{
   position:fixed; inset:0; pointer-events:none;
-  background:linear-gradient(120deg, #fff0, #fff7 45%, #fff0 60%);
+  background:linear-gradient(120deg, #0000, #fff7 45%, #0000 60%);
   transform:translateX(-100%); opacity:0; transition:transform .55s ease, opacity .55s ease;
   backdrop-filter:blur(2px);
 }
@@ -180,49 +191,49 @@ a.link:hover{ text-decoration:underline }
   background:
     linear-gradient(#fff,#fff) padding-box,
     radial-gradient(120% 120% at 0% 0%, #ffd9d9, #fff) border-box;
-  box-shadow: 0 30px 80px rgba(0,0,0,.10), 0 6px 16px rgba(0,0,0,.06);
-  transition: transform .35s ease, box-shadow .35s ease, border-color .25s ease;
-  will-change: transform, box-shadow;
+  box-shadow:0 30px 80px rgba(0,0,0,.10), 0 6px 16px rgba(0,0,0,.06);
+  transition:transform .35s ease, box-shadow .35s ease, border-color .25s ease;
+  will-change:transform, box-shadow;
 }
 .page-login .auth .hero:hover,
 .page-login .auth .card:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 40px 90px rgba(0,0,0,.12), 0 10px 22px rgba(0,0,0,.08);
+  transform:translateY(-4px);
+  box-shadow:0 40px 90px rgba(0,0,0,.12), 0 10px 22px rgba(0,0,0,.08);
 }
 .page-login .auth .card:focus-within{
   border-color:#efb5b5;
-  box-shadow: 0 42px 95px rgba(239,68,68,.10), 0 12px 26px rgba(239,68,68,.08), 0 0 0 1px #fff inset;
+  box-shadow:0 42px 95px rgba(239,68,68,.10), 0 12px 26px rgba(239,68,68,.08), 0 0 0 1px #fff inset;
 }
 .page-login input{
   border-width:2px;
-  box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 rgba(0,0,0,.02);
-  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  box-shadow:inset 0 1px 0 #ffffff, inset 0 -1px 0 rgba(0,0,0,.02);
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 .page-login input:hover{ border-color:#e5e7eb }
 .page-login input:focus{
   border-color:#b71c1c;
-  box-shadow: 0 0 0 4px #ef44441a, inset 0 2px 4px rgba(0,0,0,.03);
+  box-shadow:0 0 0 4px #ef44441a, inset 0 2px 4px rgba(0,0,0,.03);
 }
 .page-login .btn.primary{
   position:relative; overflow:hidden;
-  background: linear-gradient(180deg, #ff4b4b, #b41111);
-  box-shadow: 0 20px 38px #ef444455, 0 2px 0 rgba(0,0,0,.04);
+  background:linear-gradient(180deg,#ff4b4b,#b41111);
+  box-shadow:0 20px 38px #ef444455, 0 2px 0 rgba(0,0,0,.04);
 }
 .page-login .btn.primary::after{
   content:""; position:absolute; inset:-40%;
-  background: radial-gradient(120px 120px at var(--mx,140%) var(--my,0%), #ffffff88 0%, #ffffff33 20%, transparent 60%);
-  transition: opacity .25s ease, transform .25s ease; opacity:.0;
+  background:radial-gradient(120px 120px at var(--mx,140%) var(--my,0%), #ffffff88 0%, #ffffff33 20%, transparent 60%);
+  transition:opacity .25s ease, transform .25s ease; opacity:0;
 }
 .page-login .btn.primary:hover{ filter:brightness(1.05) }
-.page-login .btn.primary:hover::after{ opacity:.9; transform: scale(1.05); }
+.page-login .btn.primary:hover::after{ opacity:.9; transform:scale(1.05) }
 .page-login .input-affix .affix-btn{
-  transition: transform .15s ease, box-shadow .2s ease;
-  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  transition:transform .15s ease, box-shadow .2s ease;
+  box-shadow:0 1px 0 rgba(0,0,0,.04);
 }
 .page-login .input-affix .affix-btn:hover{
-  transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,.08);
+  transform:translateY(-1px); box-shadow:0 6px 12px rgba(0,0,0,.08);
 }
-@media (prefers-reduced-motion: reduce){
+@media (prefers-reduced-motion:reduce){
   .page-login .auth .hero,
   .page-login .auth .card,
   .page-login .btn.primary,
@@ -230,19 +241,21 @@ a.link:hover{ text-decoration:underline }
 }
 
 /* ============================ Formularios (OFICINAS / CAJEROS) ============================ */
-.form-shell{ max-width:1100px; margin:24px auto 60px; padding:0 16px }
-.section{ margin-top:16px }
-.section > .card{ margin-top:8px }
-.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
-.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
-.grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px }
+.form-shell{ max-width:1200px; margin:28px auto 70px; padding:0 16px }
+.section{ margin-top:18px }
+.section>.card{ margin-top:10px }
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
+.grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px }
 @media (max-width:980px){ .grid-3,.grid-4{ grid-template-columns:1fr 1fr } }
 @media (max-width:680px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr } }
+
 .table{ width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--line); }
-.table th, .table td{ padding:10px 12px; text-align:left; }
+.table th,.table td{ padding:12px 14px; text-align:left; }
 .table thead th{ background:#fafafa; color:#0f172a; border-bottom:1px solid var(--line) }
 .table tbody tr:nth-child(even){ background:#fafafa }
-.badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-weight:700; font-size:12px; background:#fff; border:1px solid var(--line); color:#111; }
+
+.badge{ display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-weight:700; font-size:13px; background:#fff; border:1px solid var(--line); color:#111; }
 .badge.red{ background:#fff5f5; border-color:#fecaca; color:#991b1b }
 
 /* ============================ Toasts ============================ */
@@ -268,12 +281,17 @@ a.link:hover{ text-decoration:underline }
 /* ============================ Helpers ============================ */
 .help{
   color:#0f172a; background:#fff; border:1px dashed var(--line);
-  border-radius:12px; padding:10px 12px;
+  border-radius:12px; padding:12px 14px;
 }
-.footer{ text-align:center; color:var(--muted); padding:16px 0; border-top:1px solid var(--line); margin-top:24px; }
+.footer{
+  text-align:center; color:var(--muted); padding:16px 0;
+  border-top:1px solid var(--line); margin-top:24px;
+}
 
+/* ============================ Responsive fino ============================ */
 @media (max-width:520px){
   .form-row{ flex-direction:column; align-items:stretch }
-  .auth .card{ padding:12px }
-  .brand-mini img{ width:38px; height:38px }
+  .auth .card{ padding:18px }
+  .brand-mini img{ width:44px; height:44px }
+  input,select,textarea,.btn{ font-size:15.75px }
 }

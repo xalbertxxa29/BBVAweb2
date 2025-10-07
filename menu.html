@@ -10,9 +10,22 @@
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <!-- Plugin Chart.js: Heatmap (matrix) -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
 
   <!-- SheetJS (Excel) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Leaflet (mapa) + Heatmap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+  <!-- Altura/encaje del mapa -->
+  <style>
+    #heatMap{height:460px;min-height:420px;width:100%;border-radius:12px;}
+    .leaflet-container{font:inherit;}
+  </style>
 
   <!-- Firebase 8.x -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -22,7 +35,7 @@
   <script src="./firebase-config.js"></script>
 </head>
 <body class="fixed-sidebar">
-  <!-- Overlay de carga (estilos vienen desde menu.css para NO tapar el sidebar) -->
+  <!-- Overlay de carga (no tapa el sidebar fijo) -->
   <div id="overlay" aria-hidden="true">
     <div class="glass-loader">
       <div class="glass-card">
@@ -49,7 +62,7 @@
       <nav class="menu">
         <button class="menu__item is-active" id="nav-home">
           <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-        <span>Inicio</span>
+          <span>Inicio</span>
         </button>
 
         <button class="menu__item" id="nav-create">
@@ -85,7 +98,7 @@
           <label>Fuente:</label>
           <select id="fuente">
             <option value="reportes_cajeros">reportes_cajeros</option>
-            <option value="reportes_oficinas">reportes_oficinas</option>
+            <option value="reportes_oficinas" selected>reportes_oficinas</option>
           </select>
         </div>
 
@@ -106,9 +119,8 @@
         </div>
 
         <div class="field">
-          <label>Turbina:</label>
-          <select id="f-turbina">
-            <option value="">Todas</option>
+          <label>Turbina <small class="muted">(Ctrl/⌘ para múltiple)</small>:</label>
+          <select id="f-turbina" multiple size="4">
             <option value="TURBINA-04">TURBINA-04</option>
             <option value="TURBINA-02">TURBINA-02</option>
             <option value="TURBINA-03">TURBINA-03</option>
@@ -116,11 +128,30 @@
           </select>
         </div>
 
-        <!-- Filtro por usuario -->
+        <!-- Filtro por usuario (múltiple por comas) -->
         <div class="field">
           <label>Usuario:</label>
-          <input id="f-usuario" list="dlUsuarios" placeholder="correo o parte…" />
+          <input id="f-usuario" list="dlUsuarios" placeholder="uno o varios correos, separados por comas…" />
           <datalist id="dlUsuarios"></datalist>
+        </div>
+
+        <div class="field">
+          <label>Conteo:</label>
+          <select id="countMode" title="Cómo contar los datos">
+            <option value="raw" selected>Registros</option>
+            <option value="unique_id">Únicos por local (mes)</option>
+            <option value="unique_day_id">Únicos por día</option>
+          </select>
+        </div>
+
+        <!-- Comparador -->
+        <div class="field">
+          <label>Comparar con:</label>
+          <div class="month-picker">
+            <input id="cmpEnabled" type="checkbox" style="margin-right:.5rem" />
+            <select id="cmpMes"></select>
+            <select id="cmpAnio"></select>
+          </div>
         </div>
 
         <div class="field actions">
@@ -169,6 +200,130 @@
           <h3>Top locales (id)</h3>
           <div class="chartbox__inner">
             <canvas id="donutChart"></canvas>
+          </div>
+        </article>
+
+        <!-- SOLO Oficinas -->
+        <article class="card chartbox">
+          <h3>Moto Save por día (mes)</h3>
+          <div class="chartbox__inner">
+            <canvas id="motoSaveDailyChart"></canvas>
+          </div>
+        </article>
+
+        <article class="card chartbox">
+          <h3>Motorizado (estado)</h3>
+          <div class="chartbox__inner">
+            <canvas id="motorizadoChart"></canvas>
+          </div>
+        </article>
+
+        <article class="card chartbox">
+          <h3>Motorizado por día (mes)</h3>
+          <div class="chartbox__inner">
+            <canvas id="motorizadoDailyChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Ranking semanal (aplica a la fuente seleccionada) -->
+        <article class="card chartbox">
+          <h3>Ranking semanal de locales (id)</h3>
+          <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-bottom:.5rem;">
+            <label for="rankTopN" class="muted">Top:</label>
+            <select id="rankTopN">
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          <div class="chartbox__inner">
+            <canvas id="weeklyRankingChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Cobertura por Turbina -->
+        <article class="card chartbox">
+          <h3>Cobertura por Turbina (Base vs Registros únicos)</h3>
+          <div class="chartbox__inner">
+            <canvas id="coverageChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Cobertura global -->
+        <article class="card chartbox">
+          <h3>Cobertura Global (Visitados vs Sin visitas)</h3>
+          <div class="chartbox__inner">
+            <canvas id="coverageGlobalChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Heatmap Día x Hora -->
+        <article class="card chartbox">
+          <h3>Heatmap: Día vs Hora</h3>
+          <div class="chartbox__inner">
+            <canvas id="heatmapChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Barras apiladas por distrito -->
+        <article class="card chartbox">
+          <h3>Distribución por Distrito (apilado)</h3>
+          <div class="chartbox__inner">
+            <canvas id="districtStackedChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Tendencia 6 meses -->
+        <article class="card chartbox">
+          <h3>Tendencia últimos 6 meses</h3>
+          <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-bottom:.5rem;">
+            <label for="trendMetric" class="muted">Métrica:</label>
+            <select id="trendMetric">
+              <option value="raw" selected>Registros</option>
+              <option value="unique_id">Únicos por local</option>
+            </select>
+          </div>
+          <div class="chartbox__inner">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Pareto de motivos -->
+        <article class="card chartbox">
+          <h3>Pareto de Motivos</h3>
+          <div class="chartbox__inner">
+            <canvas id="paretoMotivoChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Histograma por hora -->
+        <article class="card chartbox">
+          <h3>Histograma por hora del día</h3>
+          <div class="chartbox__inner">
+            <canvas id="hourHistogramChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Radar por consola -->
+        <article class="card chartbox">
+          <h3>Radar por Consola</h3>
+          <div class="chartbox__inner">
+            <canvas id="radarConsolaChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Top usuarios -->
+        <article class="card chartbox">
+          <h3>Top usuarios (registros)</h3>
+          <div class="chartbox__inner">
+            <canvas id="topUsersChart"></canvas>
+          </div>
+        </article>
+
+        <!-- MAPA (calor) -->
+        <article class="card chartbox">
+          <h3>Mapa de calor de reportes (GPS)</h3>
+          <div class="chartbox__inner">
+            <div id="heatMap"></div>
           </div>
         </article>
       </section>
